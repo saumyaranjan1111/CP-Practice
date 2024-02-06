@@ -1,3 +1,4 @@
+// https://codeforces.com/contest/126/problem/B
 //headers 
 #include<bits/stdc++.h>
 #include<ext/pb_ds/assoc_container.hpp>
