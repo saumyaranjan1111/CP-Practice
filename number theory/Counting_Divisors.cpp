@@ -1,9 +1,8 @@
-// https://training.olinfo.it/#/task/preoii_armadio/statement
 //headers 
 #include<bits/stdc++.h>
 #include<ext/pb_ds/assoc_container.hpp>
 #include<ext/pb_ds/tree_policy.hpp>
-e:\Programming\CP\Codeforces\practice\string algorithms\A_Orac_and_LCM.cpp
+
 #define endl "\n"
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 #define MOD 1000000007
@@ -59,42 +58,45 @@ void djikstra(ll root, vector<vector<pair<ll, ll>>>& graph, vector<ll> &dist){
     }
 }
 /*--------------------------------------------------------------------------------------------------------------------------*/
-void fill_phi(vector<ll>& phi){
-    // nlogn
-    phi[1] = 1;
-    for(ll i = 2; i<phi.size(); i++){
-        phi[i] = i;
-    }
+ll N = 1e7;
+vector<ll> spf(N+1);
 
-    for(ll i = 2; i<phi.size(); i++){
-        if(phi[i] == i){
-            phi[i] = i-1;
-            for(ll j = 2*i; j<phi.size(); j+=i){
-                phi[j] = phi[j] - phi[j]/i;
+void SPF(){
+    // NloglogN
+    for(ll i = 0; i<=N; i++) spf[i] = i;
+
+    for(ll i = 2; i<=N; i++){
+        if(spf[i] == i){
+            for(ll j = i; j<=N; j+=i){
+                spf[j] = min(spf[j], i);
             }
         }
     }
 }
-void solve(){
-    vector<ll> phi(4e6 + 10, 0);
-    fill_phi(phi);
 
-    vector<ll> dp(4e6 + 10, 0);
-    for(ll i = 1; i<dp.size(); i++){
-        for(ll j = 2*i; j<dp.size(); j+=i){
-            dp[j] += ((j-i)/i > 1 ? phi[(j-i)/i] : 0);
+// no of factors of a no = (k1 + 1)*(k2 + 1)...
+auto primeFactorization(ll num){
+    // log(num)
+    ll ans = 1;
+    while(num>1){
+        ll prime = spf[num];
+        ll count = 0;
+        while(num%prime == 0){
+            count++;
+            num = num/prime;
         }
+        ans *= count+1;
     }
-
+    return ans;
+}
+void solve(){
+    SPF();
     ll t;
     cin>>t;
-    vector<ll> queries(t);
-    for(ll i = 0; i<t; i++){
-        ll n; cin>>n;
-        queries[i] = n;
-    }
-    for(ll i = 0; i<t; i++){
-        cout<<dp[queries[i]]<<" ";
+    while(t--){
+        ll x; cin>>x;
+        auto ans = primeFactorization(x);
+        cout<<ans<<endl;
     }
 }
  

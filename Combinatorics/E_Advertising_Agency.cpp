@@ -1,9 +1,8 @@
-// https://training.olinfo.it/#/task/preoii_armadio/statement
 //headers 
 #include<bits/stdc++.h>
 #include<ext/pb_ds/assoc_container.hpp>
 #include<ext/pb_ds/tree_policy.hpp>
-e:\Programming\CP\Codeforces\practice\string algorithms\A_Orac_and_LCM.cpp
+
 #define endl "\n"
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 #define MOD 1000000007
@@ -37,64 +36,46 @@ ll mod_mul(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a * b) % m) + m) %
 ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) % m;}
 
 void _print(vector<ll> &arr){for(auto &x:arr)cout<<x<<" ";cout<<endl;}
-
-void djikstra(ll root, vector<vector<pair<ll, ll>>>& graph, vector<ll> &dist){
-    priority_queue <pair<ll, ll>, vector<pair<ll, ll>>, greater<pair<ll, ll>>> pq;
-
-    pq.push({0, root});
-    dist[root] = 0;
-    while(!pq.empty()){
-        ll pathwt = pq.top().first;
-        ll node = pq.top().second;
-        pq.pop();
-        for(auto child : graph[node]){
-            ll childnode = child.first;
-            ll edgewt = child.second;
-
-            if(dist[childnode] > dist[node] + edgewt){
-                dist[childnode] = dist[node] + edgewt;
-                pq.push({dist[childnode], childnode});
-            }
-        }
-    }
-}
 /*--------------------------------------------------------------------------------------------------------------------------*/
-void fill_phi(vector<ll>& phi){
-    // nlogn
-    phi[1] = 1;
-    for(ll i = 2; i<phi.size(); i++){
-        phi[i] = i;
+ll ncr(ll n, ll r, ll m){
+    ll p = 1; ll q = 1;
+    for(ll i = n; i>=n-r+1; i--){
+        p = mod_mul(p, i, m);
+    }
+    for(ll i = r; i>=1; i--){
+        q = mod_mul(q, i, m);
     }
 
-    for(ll i = 2; i<phi.size(); i++){
-        if(phi[i] == i){
-            phi[i] = i-1;
-            for(ll j = 2*i; j<phi.size(); j+=i){
-                phi[j] = phi[j] - phi[j]/i;
-            }
-        }
-    }
+    return mod_mul(p, expo(q, m-2, m), m);
 }
 void solve(){
-    vector<ll> phi(4e6 + 10, 0);
-    fill_phi(phi);
-
-    vector<ll> dp(4e6 + 10, 0);
-    for(ll i = 1; i<dp.size(); i++){
-        for(ll j = 2*i; j<dp.size(); j+=i){
-            dp[j] += ((j-i)/i > 1 ? phi[(j-i)/i] : 0);
-        }
-    }
-
     ll t;
     cin>>t;
-    vector<ll> queries(t);
-    for(ll i = 0; i<t; i++){
-        ll n; cin>>n;
-        queries[i] = n;
-    }
-    for(ll i = 0; i<t; i++){
-        cout<<dp[queries[i]]<<" ";
+    while(t--){
+        ll n, k; cin>>n>>k;
+        vector<ll> a(n); 
+        for(ll i = 0; i<n; i++) cin>>a[i];
+        sort(all(a));
+
+        map<ll,ll> mp;
+        for(ll i = 0; i<n; i++){
+            mp[a[i]]++;
+        }
+
+        map<ll,ll> windowmap;
+        for(ll i = n-k; i<n; i++){
+            windowmap[a[i]]++;
+        }
+
+        ll ans = 1;
+        for(auto it = windowmap.begin(); it!=windowmap.end(); it++){
+            ll num = it->first;
+            ll rr = it->second;
+            ll nn = mp[num];
+
+            ans = mod_mul(ans, ncr(nn, rr, MOD), MOD);
+        }
+        cout<<ans<<endl;
     }
 }
  

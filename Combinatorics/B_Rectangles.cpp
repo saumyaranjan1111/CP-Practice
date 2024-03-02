@@ -1,9 +1,9 @@
-// https://training.olinfo.it/#/task/preoii_armadio/statement
+// https://codeforces.com/contest/844/problem/B
 //headers 
 #include<bits/stdc++.h>
 #include<ext/pb_ds/assoc_container.hpp>
 #include<ext/pb_ds/tree_policy.hpp>
-e:\Programming\CP\Codeforces\practice\string algorithms\A_Orac_and_LCM.cpp
+
 #define endl "\n"
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 #define MOD 1000000007
@@ -59,43 +59,52 @@ void djikstra(ll root, vector<vector<pair<ll, ll>>>& graph, vector<ll> &dist){
     }
 }
 /*--------------------------------------------------------------------------------------------------------------------------*/
-void fill_phi(vector<ll>& phi){
-    // nlogn
-    phi[1] = 1;
-    for(ll i = 2; i<phi.size(); i++){
-        phi[i] = i;
-    }
 
-    for(ll i = 2; i<phi.size(); i++){
-        if(phi[i] == i){
-            phi[i] = i-1;
-            for(ll j = 2*i; j<phi.size(); j+=i){
-                phi[j] = phi[j] - phi[j]/i;
+void solve(){
+    ll n, m; cin>>n>>m;
+    vector<vector<ll>> a(n, vector<ll> (m));
+    vector<pair<ll, ll>> rows(n);
+    vector<pair<ll, ll>> cols(m);
+    for(ll i = 0; i<n; i++){
+        ll zeros = 0;
+        for(ll j = 0; j<m; j++){
+            cin>>a[i][j];
+            if(a[i][j] == 0) {
+                zeros++;
             }
         }
+        rows[i].first = zeros;
+        rows[i].second = m-zeros;
     }
-}
-void solve(){
-    vector<ll> phi(4e6 + 10, 0);
-    fill_phi(phi);
 
-    vector<ll> dp(4e6 + 10, 0);
-    for(ll i = 1; i<dp.size(); i++){
-        for(ll j = 2*i; j<dp.size(); j+=i){
-            dp[j] += ((j-i)/i > 1 ? phi[(j-i)/i] : 0);
+    for(ll j = 0; j<m; j++){
+        ll zeros = 0;
+        for(ll i = 0; i<n; i++){
+            if(a[i][j] == 0){
+                zeros++;
+            }
         }
+        cols[j].first = zeros;
+        cols[j].second = n-zeros;
     }
 
-    ll t;
-    cin>>t;
-    vector<ll> queries(t);
-    for(ll i = 0; i<t; i++){
-        ll n; cin>>n;
-        queries[i] = n;
+    ll ans = 0;
+    // rows
+    for(ll i = 0; i<n; i++){
+        ll z = rows[i].first;
+        ll o = rows[i].second;
+        ans += expo(2, z, 1e18) + expo(2, o, 1e18) - 2 - z - o;
     }
-    for(ll i = 0; i<t; i++){
-        cout<<dp[queries[i]]<<" ";
+
+    // columns
+    for(ll j = 0; j<m; j++){
+        ll z = cols[j].first;
+        ll o = cols[j].second;
+        ans += expo(2, z, 1e18) + expo(2, o, 1e18) - 2 - z - o;
     }
+
+    ans += n*m;
+    cout<<ans<<endl;
 }
  
 signed main() {

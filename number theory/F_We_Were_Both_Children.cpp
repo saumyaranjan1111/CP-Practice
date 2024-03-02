@@ -1,9 +1,9 @@
-// https://training.olinfo.it/#/task/preoii_armadio/statement
+// https://codeforces.com/problemset/problem/1850/F?locale=en
 //headers 
 #include<bits/stdc++.h>
 #include<ext/pb_ds/assoc_container.hpp>
 #include<ext/pb_ds/tree_policy.hpp>
-e:\Programming\CP\Codeforces\practice\string algorithms\A_Orac_and_LCM.cpp
+
 #define endl "\n"
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 #define MOD 1000000007
@@ -59,42 +59,47 @@ void djikstra(ll root, vector<vector<pair<ll, ll>>>& graph, vector<ll> &dist){
     }
 }
 /*--------------------------------------------------------------------------------------------------------------------------*/
-void fill_phi(vector<ll>& phi){
-    // nlogn
-    phi[1] = 1;
-    for(ll i = 2; i<phi.size(); i++){
-        phi[i] = i;
-    }
 
-    for(ll i = 2; i<phi.size(); i++){
-        if(phi[i] == i){
-            phi[i] = i-1;
-            for(ll j = 2*i; j<phi.size(); j+=i){
-                phi[j] = phi[j] - phi[j]/i;
-            }
-        }
-    }
-}
 void solve(){
-    vector<ll> phi(4e6 + 10, 0);
-    fill_phi(phi);
-
-    vector<ll> dp(4e6 + 10, 0);
-    for(ll i = 1; i<dp.size(); i++){
-        for(ll j = 2*i; j<dp.size(); j+=i){
-            dp[j] += ((j-i)/i > 1 ? phi[(j-i)/i] : 0);
-        }
-    }
-
     ll t;
     cin>>t;
-    vector<ll> queries(t);
-    for(ll i = 0; i<t; i++){
+    while(t--){
         ll n; cin>>n;
-        queries[i] = n;
-    }
-    for(ll i = 0; i<t; i++){
-        cout<<dp[queries[i]]<<" ";
+        map<ll, ll> mp;
+        for(ll i = 0; i<n; i++){
+            ll x; cin>>x;
+            mp[x]++;
+        }
+        vector<ll> points(n+1, 0);
+        for(ll num = n; num>=1; num--){
+            for(ll i = 1; i*i<=num; i++){
+                if(num%i == 0){
+                    // i is a factor
+                    if(num/i != i){
+                        // if both the factors are different then check if both the factors existedin the original array or not
+                        // if they existed that means the frogs having those values will land on the point: num
+                        // so increase the value of the point: num by the no of factors of num that are present in the original array
+
+                        if(mp.find(i) != mp.end()){
+                            points[num]+=mp[i];
+                        }
+                        if(mp.find(num/i) != mp.end()){
+                            points[num]+=mp[num/i];
+                        }
+                    } else {
+                        if(mp.find(i) != mp.end()){
+                            points[num]+=mp[i];
+                        }
+                    }
+                }
+            }
+        }
+
+        ll ans = 0;
+        for(auto point: points){
+            ans = max(ans, point);
+        }
+        cout<<ans<<endl;
     }
 }
  

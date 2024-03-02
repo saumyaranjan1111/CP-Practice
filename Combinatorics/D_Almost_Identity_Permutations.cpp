@@ -1,9 +1,9 @@
-// https://training.olinfo.it/#/task/preoii_armadio/statement
+// https://codeforces.com/contest/888/problem/D
 //headers 
 #include<bits/stdc++.h>
 #include<ext/pb_ds/assoc_container.hpp>
 #include<ext/pb_ds/tree_policy.hpp>
-e:\Programming\CP\Codeforces\practice\string algorithms\A_Orac_and_LCM.cpp
+
 #define endl "\n"
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 #define MOD 1000000007
@@ -38,64 +38,34 @@ ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) %
 
 void _print(vector<ll> &arr){for(auto &x:arr)cout<<x<<" ";cout<<endl;}
 
-void djikstra(ll root, vector<vector<pair<ll, ll>>>& graph, vector<ll> &dist){
-    priority_queue <pair<ll, ll>, vector<pair<ll, ll>>, greater<pair<ll, ll>>> pq;
-
-    pq.push({0, root});
-    dist[root] = 0;
-    while(!pq.empty()){
-        ll pathwt = pq.top().first;
-        ll node = pq.top().second;
-        pq.pop();
-        for(auto child : graph[node]){
-            ll childnode = child.first;
-            ll edgewt = child.second;
-
-            if(dist[childnode] > dist[node] + edgewt){
-                dist[childnode] = dist[node] + edgewt;
-                pq.push({dist[childnode], childnode});
-            }
-        }
-    }
-}
 /*--------------------------------------------------------------------------------------------------------------------------*/
-void fill_phi(vector<ll>& phi){
-    // nlogn
-    phi[1] = 1;
-    for(ll i = 2; i<phi.size(); i++){
-        phi[i] = i;
+ll ncr(ll n, ll r){
+    ll p = 1;
+    ll q = 1;
+    for(ll i = n; i>=n-r+1; i--){
+        p *= i;
     }
-
-    for(ll i = 2; i<phi.size(); i++){
-        if(phi[i] == i){
-            phi[i] = i-1;
-            for(ll j = 2*i; j<phi.size(); j+=i){
-                phi[j] = phi[j] - phi[j]/i;
-            }
-        }
+    for(ll i = r; i>=1; i--){
+        q *= i;
     }
+    return p/q;
 }
+
 void solve(){
-    vector<ll> phi(4e6 + 10, 0);
-    fill_phi(phi);
-
-    vector<ll> dp(4e6 + 10, 0);
-    for(ll i = 1; i<dp.size(); i++){
-        for(ll j = 2*i; j<dp.size(); j+=i){
-            dp[j] += ((j-i)/i > 1 ? phi[(j-i)/i] : 0);
-        }
+    ll n, k; cin>>n>>k;
+    vector<ll> derangements(5);
+    derangements[1] = 0; derangements[2] = 1;
+    for(ll i = 3; i<=4; i++){
+        derangements[i] = (i-1)*(derangements[i-1] + derangements[i-2]);
     }
-
-    ll t;
-    cin>>t;
-    vector<ll> queries(t);
-    for(ll i = 0; i<t; i++){
-        ll n; cin>>n;
-        queries[i] = n;
+    vector<ll> &d = derangements;
+    // d0 = 0, d1 = 0, d2 = 1, d3 = 2, d4 = 9
+    // d[i] = (i-1)*(d[i-1] + d[i-2])
+    ll ans = 1;
+    for(ll i = 1; i<=k; i++){
+        ans += ncr(n, i) * d[i];
     }
-    for(ll i = 0; i<t; i++){
-        cout<<dp[queries[i]]<<" ";
-    }
+    cout<<ans<<endl;
 }
  
 signed main() {

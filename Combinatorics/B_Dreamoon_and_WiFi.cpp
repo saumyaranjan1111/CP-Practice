@@ -1,9 +1,8 @@
-// https://training.olinfo.it/#/task/preoii_armadio/statement
 //headers 
 #include<bits/stdc++.h>
 #include<ext/pb_ds/assoc_container.hpp>
 #include<ext/pb_ds/tree_policy.hpp>
-e:\Programming\CP\Codeforces\practice\string algorithms\A_Orac_and_LCM.cpp
+
 #define endl "\n"
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 #define MOD 1000000007
@@ -59,43 +58,52 @@ void djikstra(ll root, vector<vector<pair<ll, ll>>>& graph, vector<ll> &dist){
     }
 }
 /*--------------------------------------------------------------------------------------------------------------------------*/
-void fill_phi(vector<ll>& phi){
-    // nlogn
-    phi[1] = 1;
-    for(ll i = 2; i<phi.size(); i++){
-        phi[i] = i;
+ll ncr(ll n, ll r){
+    ll p = 1;
+    ll q = 1;
+    for(ll i = n; i>=n-r+1; i--){
+        p*=i;
     }
-
-    for(ll i = 2; i<phi.size(); i++){
-        if(phi[i] == i){
-            phi[i] = i-1;
-            for(ll j = 2*i; j<phi.size(); j+=i){
-                phi[j] = phi[j] - phi[j]/i;
-            }
-        }
+    for(ll i = r; i>=1; i--){
+        q*=i;
     }
+    return p/q;
 }
 void solve(){
-    vector<ll> phi(4e6 + 10, 0);
-    fill_phi(phi);
+    string s1; cin>>s1;
+    string s2; cin>>s2;
 
-    vector<ll> dp(4e6 + 10, 0);
-    for(ll i = 1; i<dp.size(); i++){
-        for(ll j = 2*i; j<dp.size(); j+=i){
-            dp[j] += ((j-i)/i > 1 ? phi[(j-i)/i] : 0);
-        }
+    ll dest = 0;
+    for(auto c : s1){
+        if(c == '+') dest++;
+        else dest--;
     }
 
-    ll t;
-    cin>>t;
-    vector<ll> queries(t);
-    for(ll i = 0; i<t; i++){
-        ll n; cin>>n;
-        queries[i] = n;
+    ll q = 0;
+    for(auto c : s2){
+        if(c == '?') q++;
+        else if(c == '+') dest--;
+        else dest++;
     }
-    for(ll i = 0; i<t; i++){
-        cout<<dp[queries[i]]<<" ";
+
+    if(q == 0 && dest != 0){
+        cout<<fixed<<setprecision(12)<<(double)0<<endl;
+        return;
+    } else if(q == 0 && dest == 0){
+        cout<<fixed<<setprecision(12)<<(double)1<<endl;
+        return;
     }
+    if(abs(dest) > q){
+        cout<<fixed<<setprecision(12)<<(double)0<<endl;
+        return;
+    }
+    ll plus = (q + dest)/2;
+    ll minus = (q - dest)/2;
+
+    double favor = ncr(q, plus);
+    double total = expo(2, q, 1e18);
+
+    cout<<fixed<<setprecision(12)<<favor/total<<endl;
 }
  
 signed main() {

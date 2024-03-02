@@ -1,9 +1,9 @@
-// https://training.olinfo.it/#/task/preoii_armadio/statement
+// https://atcoder.jp/contests/abc169/tasks/abc169_d
 //headers 
 #include<bits/stdc++.h>
 #include<ext/pb_ds/assoc_container.hpp>
 #include<ext/pb_ds/tree_policy.hpp>
-e:\Programming\CP\Codeforces\practice\string algorithms\A_Orac_and_LCM.cpp
+
 #define endl "\n"
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 #define MOD 1000000007
@@ -59,43 +59,40 @@ void djikstra(ll root, vector<vector<pair<ll, ll>>>& graph, vector<ll> &dist){
     }
 }
 /*--------------------------------------------------------------------------------------------------------------------------*/
-void fill_phi(vector<ll>& phi){
-    // nlogn
-    phi[1] = 1;
-    for(ll i = 2; i<phi.size(); i++){
-        phi[i] = i;
-    }
 
-    for(ll i = 2; i<phi.size(); i++){
-        if(phi[i] == i){
-            phi[i] = i-1;
-            for(ll j = 2*i; j<phi.size(); j+=i){
-                phi[j] = phi[j] - phi[j]/i;
+void solve(){
+    ll n; cin>>n;
+    // get all the powers of its prime factors
+    vector<ll> expos;
+    for(ll i = 2; i*i<=n; i++){
+        ll count = 0;
+        while(n%i == 0){
+            count++;
+            n = n/i;
+        }
+        if(count > 0)
+        expos.pb(count);
+    }
+    if(n > 1){
+        expos.pb(1);
+    }
+    ll result = 0;
+    // for each one of those exponents, find the largest value of x such that x*(x+1) <= 2*expo
+    for(ll &k : expos){
+        ll low = 0, high = 2*k;
+        ll ans = low;
+        while(low <= high){
+            ll mid = low + (high - low)/2;
+            if(mid*(mid+1) <= 2*k){
+                ans = mid;
+                low = mid+1;
+            } else {
+                high = mid-1;
             }
         }
+        result += ans;
     }
-}
-void solve(){
-    vector<ll> phi(4e6 + 10, 0);
-    fill_phi(phi);
-
-    vector<ll> dp(4e6 + 10, 0);
-    for(ll i = 1; i<dp.size(); i++){
-        for(ll j = 2*i; j<dp.size(); j+=i){
-            dp[j] += ((j-i)/i > 1 ? phi[(j-i)/i] : 0);
-        }
-    }
-
-    ll t;
-    cin>>t;
-    vector<ll> queries(t);
-    for(ll i = 0; i<t; i++){
-        ll n; cin>>n;
-        queries[i] = n;
-    }
-    for(ll i = 0; i<t; i++){
-        cout<<dp[queries[i]]<<" ";
-    }
+    cout<<result<<endl;
 }
  
 signed main() {

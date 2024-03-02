@@ -1,9 +1,9 @@
-// https://training.olinfo.it/#/task/preoii_armadio/statement
+// https://cses.fi/problemset/task/1082
 //headers 
 #include<bits/stdc++.h>
 #include<ext/pb_ds/assoc_container.hpp>
 #include<ext/pb_ds/tree_policy.hpp>
-e:\Programming\CP\Codeforces\practice\string algorithms\A_Orac_and_LCM.cpp
+
 #define endl "\n"
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 #define MOD 1000000007
@@ -35,67 +35,37 @@ ll expo(ll a, ll b, ll mod) {ll res = 1; while (b > 0) {if (b & 1)res = (res * a
 ll mod_add(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a + b) % m) + m) % m;}
 ll mod_mul(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a * b) % m) + m) % m;}
 ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) % m;}
-
+ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return mod_mul(a, expo(b, m-2, m), m);}
 void _print(vector<ll> &arr){for(auto &x:arr)cout<<x<<" ";cout<<endl;}
 
-void djikstra(ll root, vector<vector<pair<ll, ll>>>& graph, vector<ll> &dist){
-    priority_queue <pair<ll, ll>, vector<pair<ll, ll>>, greater<pair<ll, ll>>> pq;
-
-    pq.push({0, root});
-    dist[root] = 0;
-    while(!pq.empty()){
-        ll pathwt = pq.top().first;
-        ll node = pq.top().second;
-        pq.pop();
-        for(auto child : graph[node]){
-            ll childnode = child.first;
-            ll edgewt = child.second;
-
-            if(dist[childnode] > dist[node] + edgewt){
-                dist[childnode] = dist[node] + edgewt;
-                pq.push({dist[childnode], childnode});
-            }
-        }
-    }
-}
 /*--------------------------------------------------------------------------------------------------------------------------*/
-void fill_phi(vector<ll>& phi){
-    // nlogn
-    phi[1] = 1;
-    for(ll i = 2; i<phi.size(); i++){
-        phi[i] = i;
-    }
 
-    for(ll i = 2; i<phi.size(); i++){
-        if(phi[i] == i){
-            phi[i] = i-1;
-            for(ll j = 2*i; j<phi.size(); j+=i){
-                phi[j] = phi[j] - phi[j]/i;
-            }
-        }
-    }
-}
 void solve(){
-    vector<ll> phi(4e6 + 10, 0);
-    fill_phi(phi);
-
-    vector<ll> dp(4e6 + 10, 0);
-    for(ll i = 1; i<dp.size(); i++){
-        for(ll j = 2*i; j<dp.size(); j+=i){
-            dp[j] += ((j-i)/i > 1 ? phi[(j-i)/i] : 0);
+    ll n; cin>>n;
+    vector<pair<ll, ll>> pf;
+    for(ll i = 2; i*i<=n; i++){
+        ll count = 0;
+        while(n % i == 0){
+            count++;
+            n = n/i;
+        }
+        if(count > 0){
+            pf.pb({i, count});
         }
     }
+    if(n > 1){
+        pf.pb({n, 1});
+    }
 
-    ll t;
-    cin>>t;
-    vector<ll> queries(t);
-    for(ll i = 0; i<t; i++){
-        ll n; cin>>n;
-        queries[i] = n;
+    ll ans = 1;
+    for(auto temp: pf){
+        ll p = temp.first;
+        ll k = temp.second;
+        ll numerator = expo(p, k+1, MOD) - 1;
+        ll denominator = p - 1;
+        ans = mod_mul(ans, mod_div(numerator, denominator, MOD), MOD);
     }
-    for(ll i = 0; i<t; i++){
-        cout<<dp[queries[i]]<<" ";
-    }
+    cout<<ans<<endl;
 }
  
 signed main() {

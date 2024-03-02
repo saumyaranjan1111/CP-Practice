@@ -1,9 +1,8 @@
-// https://training.olinfo.it/#/task/preoii_armadio/statement
 //headers 
 #include<bits/stdc++.h>
 #include<ext/pb_ds/assoc_container.hpp>
 #include<ext/pb_ds/tree_policy.hpp>
-e:\Programming\CP\Codeforces\practice\string algorithms\A_Orac_and_LCM.cpp
+
 #define endl "\n"
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 #define MOD 1000000007
@@ -59,43 +58,29 @@ void djikstra(ll root, vector<vector<pair<ll, ll>>>& graph, vector<ll> &dist){
     }
 }
 /*--------------------------------------------------------------------------------------------------------------------------*/
-void fill_phi(vector<ll>& phi){
-    // nlogn
-    phi[1] = 1;
-    for(ll i = 2; i<phi.size(); i++){
-        phi[i] = i;
-    }
 
-    for(ll i = 2; i<phi.size(); i++){
-        if(phi[i] == i){
-            phi[i] = i-1;
-            for(ll j = 2*i; j<phi.size(); j+=i){
-                phi[j] = phi[j] - phi[j]/i;
-            }
-        }
-    }
-}
 void solve(){
-    vector<ll> phi(4e6 + 10, 0);
-    fill_phi(phi);
+    ll a, b, c, d;
+    cin>>a>>b>>c>>d;
 
-    vector<ll> dp(4e6 + 10, 0);
-    for(ll i = 1; i<dp.size(); i++){
-        for(ll j = 2*i; j<dp.size(); j+=i){
-            dp[j] += ((j-i)/i > 1 ? phi[(j-i)/i] : 0);
-        }
-    }
+    // either smaller wins in the first game, or in the 3rd game, or in the 5th game and so on
+    // if smaller wins in the first game itself : a/b
+    // if he wins in the 3rd game, then he will miss in the first game : (b-a)/b and zanoes will also miss in the second game : (d-c)/d and finally he will hit in the third game : a/b
+    // let P(3) be defined as he wins in the third game, then P(3) : ((b-a)/b)*((d-c)/d)*(a/b)
+    // all of the independent ways in which he can win : P(1) + P(3) + P(5) and so on 
+    // which turns out to be an infinite gp 
 
-    ll t;
-    cin>>t;
-    vector<ll> queries(t);
-    for(ll i = 0; i<t; i++){
-        ll n; cin>>n;
-        queries[i] = n;
-    }
-    for(ll i = 0; i<t; i++){
-        cout<<dp[queries[i]]<<" ";
-    }
+    // sum of all such ps : a/b{1 + r + r*r + r*r*r + ...}
+    // r = ((b-a)*(d-c))/(b*d)
+
+    double r = (b-a)*(d-c);
+    r = r/b; r = r/d;
+
+    double ans = 1;
+    ans*=a;
+    ans/=b;
+    ans*= (1/(1-r));
+    cout<<fixed<<setprecision(12)<<ans<<endl;
 }
  
 signed main() {

@@ -1,9 +1,9 @@
-// https://training.olinfo.it/#/task/preoii_armadio/statement
+// https://codeforces.com/problemset/problem/495/B
 //headers 
 #include<bits/stdc++.h>
 #include<ext/pb_ds/assoc_container.hpp>
 #include<ext/pb_ds/tree_policy.hpp>
-e:\Programming\CP\Codeforces\practice\string algorithms\A_Orac_and_LCM.cpp
+
 #define endl "\n"
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 #define MOD 1000000007
@@ -59,42 +59,32 @@ void djikstra(ll root, vector<vector<pair<ll, ll>>>& graph, vector<ll> &dist){
     }
 }
 /*--------------------------------------------------------------------------------------------------------------------------*/
-void fill_phi(vector<ll>& phi){
-    // nlogn
-    phi[1] = 1;
-    for(ll i = 2; i<phi.size(); i++){
-        phi[i] = i;
-    }
 
-    for(ll i = 2; i<phi.size(); i++){
-        if(phi[i] == i){
-            phi[i] = i-1;
-            for(ll j = 2*i; j<phi.size(); j+=i){
-                phi[j] = phi[j] - phi[j]/i;
-            }
-        }
-    }
-}
 void solve(){
-    vector<ll> phi(4e6 + 10, 0);
-    fill_phi(phi);
+    ll a, b;
+    cin>>a>>b;
+    ll count = 0;
 
-    vector<ll> dp(4e6 + 10, 0);
-    for(ll i = 1; i<dp.size(); i++){
-        for(ll j = 2*i; j<dp.size(); j+=i){
-            dp[j] += ((j-i)/i > 1 ? phi[(j-i)/i] : 0);
+    if(a == b){
+        cout<<"infinity"<<endl;
+    } else if(a < b){
+        cout<<0<<endl;
+    } else {
+        ll x = (a-b);
+        for(ll k = 1; k*k<=x; k++){
+            // if(x/k <= b) break;
+
+            if(x%k == 0){
+                ll f1 = k, f2 = x/k;
+
+                if(f2 > b) {
+                    count++;
+                    if(f1 > b) count++;
+                    if(f1 == f2) count--;
+                }
+            } 
         }
-    }
-
-    ll t;
-    cin>>t;
-    vector<ll> queries(t);
-    for(ll i = 0; i<t; i++){
-        ll n; cin>>n;
-        queries[i] = n;
-    }
-    for(ll i = 0; i<t; i++){
-        cout<<dp[queries[i]]<<" ";
+        cout<<count<<endl;
     }
 }
  

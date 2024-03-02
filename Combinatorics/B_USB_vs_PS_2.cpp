@@ -1,9 +1,8 @@
-// https://training.olinfo.it/#/task/preoii_armadio/statement
 //headers 
 #include<bits/stdc++.h>
 #include<ext/pb_ds/assoc_container.hpp>
 #include<ext/pb_ds/tree_policy.hpp>
-e:\Programming\CP\Codeforces\practice\string algorithms\A_Orac_and_LCM.cpp
+
 #define endl "\n"
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 #define MOD 1000000007
@@ -38,64 +37,61 @@ ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) %
 
 void _print(vector<ll> &arr){for(auto &x:arr)cout<<x<<" ";cout<<endl;}
 
-void djikstra(ll root, vector<vector<pair<ll, ll>>>& graph, vector<ll> &dist){
-    priority_queue <pair<ll, ll>, vector<pair<ll, ll>>, greater<pair<ll, ll>>> pq;
-
-    pq.push({0, root});
-    dist[root] = 0;
-    while(!pq.empty()){
-        ll pathwt = pq.top().first;
-        ll node = pq.top().second;
-        pq.pop();
-        for(auto child : graph[node]){
-            ll childnode = child.first;
-            ll edgewt = child.second;
-
-            if(dist[childnode] > dist[node] + edgewt){
-                dist[childnode] = dist[node] + edgewt;
-                pq.push({dist[childnode], childnode});
-            }
-        }
-    }
-}
 /*--------------------------------------------------------------------------------------------------------------------------*/
-void fill_phi(vector<ll>& phi){
-    // nlogn
-    phi[1] = 1;
-    for(ll i = 2; i<phi.size(); i++){
-        phi[i] = i;
-    }
 
-    for(ll i = 2; i<phi.size(); i++){
-        if(phi[i] == i){
-            phi[i] = i-1;
-            for(ll j = 2*i; j<phi.size(); j+=i){
-                phi[j] = phi[j] - phi[j]/i;
+void solve(){
+
+        ll a, b, c; cin>>a>>b>>c;
+        ll total = a+b+c;
+        ll m; cin>>m;
+        vector<ll> usb;
+        vector<ll> ps;
+        for(ll i = 0; i<m; i++){
+            ll cost; string s;
+            cin>>cost; cin>>s;
+            if(s == "USB"){
+                usb.pb(cost);
+            } else {
+                ps.pb(cost);
             }
         }
-    }
-}
-void solve(){
-    vector<ll> phi(4e6 + 10, 0);
-    fill_phi(phi);
+        sort(all(usb)); sort(all(ps));
+        // first try to fill the requirements of all the usb computers
+        // then the ps2 computers
+        // then lastly the bisexual computers
 
-    vector<ll> dp(4e6 + 10, 0);
-    for(ll i = 1; i<dp.size(); i++){
-        for(ll j = 2*i; j<dp.size(); j+=i){
-            dp[j] += ((j-i)/i > 1 ? phi[(j-i)/i] : 0);
+        ll ans = 0;
+        ll i = 0, j = 0;
+        while(a > 0 && i<usb.size()){
+            ans += usb[i];
+            i++;
+            a--;
         }
-    }
 
-    ll t;
-    cin>>t;
-    vector<ll> queries(t);
-    for(ll i = 0; i<t; i++){
-        ll n; cin>>n;
-        queries[i] = n;
-    }
-    for(ll i = 0; i<t; i++){
-        cout<<dp[queries[i]]<<" ";
-    }
+        while(b > 0 && j<ps.size()){
+            ans += ps[j];
+            j++;
+            b--;
+        }
+
+        vector<ll> rem; 
+        while(i<usb.size()){
+            rem.pb(usb[i]); i++;
+        }
+        while(j<ps.size()){
+            rem.pb(ps[j]); j++;
+        }
+
+        sort(all(rem));
+
+        ll k = 0;
+        while(c>0 && k<rem.size()){
+            ans += rem[k];
+            k++;
+            c--;
+        }
+        cout<<total-(a+b+c)<<endl;
+        cout<<ans<<endl;
 }
  
 signed main() {

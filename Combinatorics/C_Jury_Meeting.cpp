@@ -1,9 +1,8 @@
-// https://training.olinfo.it/#/task/preoii_armadio/statement
 //headers 
 #include<bits/stdc++.h>
 #include<ext/pb_ds/assoc_container.hpp>
 #include<ext/pb_ds/tree_policy.hpp>
-e:\Programming\CP\Codeforces\practice\string algorithms\A_Orac_and_LCM.cpp
+
 #define endl "\n"
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 #define MOD 1000000007
@@ -37,64 +36,62 @@ ll mod_mul(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a * b) % m) + m) %
 ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) % m;}
 
 void _print(vector<ll> &arr){for(auto &x:arr)cout<<x<<" ";cout<<endl;}
-
-void djikstra(ll root, vector<vector<pair<ll, ll>>>& graph, vector<ll> &dist){
-    priority_queue <pair<ll, ll>, vector<pair<ll, ll>>, greater<pair<ll, ll>>> pq;
-
-    pq.push({0, root});
-    dist[root] = 0;
-    while(!pq.empty()){
-        ll pathwt = pq.top().first;
-        ll node = pq.top().second;
-        pq.pop();
-        for(auto child : graph[node]){
-            ll childnode = child.first;
-            ll edgewt = child.second;
-
-            if(dist[childnode] > dist[node] + edgewt){
-                dist[childnode] = dist[node] + edgewt;
-                pq.push({dist[childnode], childnode});
-            }
-        }
-    }
-}
 /*--------------------------------------------------------------------------------------------------------------------------*/
-void fill_phi(vector<ll>& phi){
-    // nlogn
-    phi[1] = 1;
-    for(ll i = 2; i<phi.size(); i++){
-        phi[i] = i;
-    }
-
-    for(ll i = 2; i<phi.size(); i++){
-        if(phi[i] == i){
-            phi[i] = i-1;
-            for(ll j = 2*i; j<phi.size(); j+=i){
-                phi[j] = phi[j] - phi[j]/i;
-            }
-        }
-    }
+ll ncr(ll n, ll r, ll m, vector<ll> &fact, vector<ll> &ifact){
+    // O(1)
+    return mod_mul(fact[n], mod_mul(ifact[n-r], ifact[r], m), m);
 }
 void solve(){
-    vector<ll> phi(4e6 + 10, 0);
-    fill_phi(phi);
-
-    vector<ll> dp(4e6 + 10, 0);
-    for(ll i = 1; i<dp.size(); i++){
-        for(ll j = 2*i; j<dp.size(); j+=i){
-            dp[j] += ((j-i)/i > 1 ? phi[(j-i)/i] : 0);
-        }
+    ll N = 1e6; 
+    ll m = MOD1;
+    vector<ll> fact(N+1);
+    vector<ll> ifact(N+1);
+    fact[0] = 1;
+    for(ll i = 1; i<=N; i++){
+        fact[i] = mod_mul(i, fact[i-1], m);
+    }
+    // ifact[n] = fact[n] ^ (m-2)
+    ifact[N] = expo(fact[N], m-2, m);
+    for(ll i = N-1; i>=0; i--){
+        ifact[i] = mod_mul(i+1, ifact[i+1], m);
     }
 
     ll t;
     cin>>t;
-    vector<ll> queries(t);
-    for(ll i = 0; i<t; i++){
+    while(t--){
         ll n; cin>>n;
-        queries[i] = n;
-    }
-    for(ll i = 0; i<t; i++){
-        cout<<dp[queries[i]]<<" ";
+        vector<ll> a(n);
+        for(ll i = 0; i<n; i++) cin>>a[i];
+        
+        sort(all(a));
+        ll maxi = a[n-1];
+        ll secmaxi = a[n-2];
+
+        map<ll, ll> mp;
+        for(auto x : a) mp[-x]++;
+        if(maxi == secmaxi){
+            // all permutations are valid
+            cout<<fact[n]<<endl;
+        } else if(maxi == secmaxi + 1){
+            // all permutations in which the second maximums all occur before the maximum, will be invalid
+            ll invalid = 0;
+            auto it = mp.begin(); it++;
+            ll count = it->second;
+            for(ll i = count; i<n; i++){
+                ll temp = 1;
+                ll iccount = ncr(i, count, MOD1, fact, ifact);
+                temp = mod_mul(temp, iccount, MOD1);
+                temp = mod_mul(temp, fact[n-count-1], MOD1);
+                temp = mod_mul(temp, fact[count], MOD1);
+
+                invalid = mod_add(invalid, temp, MOD1);
+            }
+
+            ll p = fact[n];
+            cout<<mod_sub(p, invalid, MOD1)<<endl;
+        } else {
+            cout<<0<<endl;
+        }
     }
 }
  
